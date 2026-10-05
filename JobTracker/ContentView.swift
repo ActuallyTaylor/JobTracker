@@ -7,76 +7,96 @@
 
 import SwiftUI
 import SwiftData
+import SFSafeSymbols
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Query private var jobListings: [JobListing]
+    
+    @State var selectedStatus: JobStatus = .unapplied
+    @State var selectedJobs: Set<JobListing> = []
+    
+    @State var presentJobCreationSheet: Bool = false
 
     var body: some View {
-        NavigationViewWrapper {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-#if os(macOS)
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-#endif
-            .toolbar {
-#if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-#endif
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
-    }
-}
-
-fileprivate struct NavigationViewWrapper<Content: View>: View {
-    let content: () -> Content
-
-    var body: some View {
-#if os(macOS)
         NavigationSplitView {
-            content()
+            sidebar
+        } content: {
+            let jobs = jobListings.filter({ $0.status == selectedStatus })
+            
+            List(selection: $selectedJobs) {
+                ForEach(jobs) { job in
+                    VStack(alignment: .leading) {
+                        Text(job.name)
+                        Text(job.companyName)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .tag(job)
+                    .contextMenu {
+                        Button {
+                            // Activating a context menu does not always add the job to the selection, so add it here. It is a set so no need to worry about duplicates.
+                            selectedJobs.insert(job)
+                            delete(jobs: selectedJobs)
+                        } label: {
+                            Label("Delete", systemSymbol: .trash)
+                        }
+                    }
+                }
+                .onDelete { indexSet in
+                    let jobsToDelete = jobs.enumerated().compactMap { element in
+                        if indexSet.contains(element.offset) {
+                            return element.element
+                        } else {
+                            return nil
+                        }
+                    }
+                    
+                    delete(jobs: Set(jobsToDelete))
+                }
+                .onDeleteCommand {
+                    delete(jobs: selectedJobs)
+                }
+            }
         } detail: {
-            Text("Select an item")
+            Group {
+                if let selectedJob = selectedJobs.first {
+                    Text(selectedJob.name)
+                } else {
+                    Text("Select a job to see details.")
+                }
+            }
+            .toolbar {
+                Button {
+                    presentJobCreationSheet.toggle()
+                } label: {
+                    Label("Add Job Listing", systemSymbol: .plus)
+                }
+            }
         }
-#else
-        NavigationStack {
-            content()
+        .sheet(isPresented: $presentJobCreationSheet) {
+            CreateJobListingSheet()
         }
-#endif
+    }
+    
+    var sidebar: some View {
+        List(selection: $selectedStatus) {
+            ForEach(JobStatus.allCases, id: \.description) { status in
+                Text(status.description)
+                    .badge(jobListings.filter({ $0.status == status }).count)
+                    .tag(status)
+            }
+        }
+    }
+    
+    private func delete(jobs: Set<JobListing>) {
+        for index in jobs.indices {
+            modelContext.delete(jobs[index])
+        }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: JobListing.self, inMemory: true)
 }
