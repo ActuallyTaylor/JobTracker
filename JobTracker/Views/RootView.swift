@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  RootView.swift
 //  JobTracker
 //
 //  Created by Taylor Lineman on 10/5/26.
@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 import SFSafeSymbols
 
-struct ContentView: View {
+struct RootView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var jobListings: [JobListing]
     
@@ -76,7 +76,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $presentJobCreationSheet) {
-            CreateJobListingSheet()
+            CreateJobListingSheet(jobStatus: selectedStatus)
         }
     }
     
@@ -98,6 +98,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    RootView()
         .modelContainer(for: JobListing.self, inMemory: true)
 }

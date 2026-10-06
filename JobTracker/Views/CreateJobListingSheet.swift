@@ -54,6 +54,7 @@ struct CreateJobListingSheet: View {
                         .tag(status)
                 }
             }
+            .tint(jobStatus.color)
             
             LabeledContent("Notes") {
                 TextEditor(text: $jobNotes)
