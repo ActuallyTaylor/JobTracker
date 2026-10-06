@@ -61,7 +61,8 @@ struct ContentView: View {
         } detail: {
             Group {
                 if let selectedJob = selectedJobs.first {
-                    Text(selectedJob.name)
+                    JobListingView(jobListing: selectedJob)
+                        .id(selectedJob.id)
                 } else {
                     Text("Select a job to see details.")
                 }

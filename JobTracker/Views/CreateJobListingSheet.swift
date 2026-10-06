@@ -99,5 +99,5 @@ struct CreateJobListingSheet: View {
 
 #Preview {
     CreateJobListingSheet()
-        .modelContainer(for: JobListing.self, inMemory: true)
+        .modelContainer(for: [JobListing.self, JobApplicationEssay.self])
 }
