@@ -29,23 +29,6 @@ struct JobListingView: View {
             }
             .padding(.horizontal, 10)
         }
-//        Form {
-//            TextField("Name", text: $jobListing.name)
-//            TextField("Company", text: $jobListing.companyName)
-//            TextField("Application URL", text: $stringifiedURL)
-//            
-//            Picker("Status", selection: $jobListing.status) {
-//                ForEach(JobStatus.allCases, id: \.description) { status in
-//                    Text(status.description)
-//                        .tag(status)
-//                }
-//            }
-//            
-//            LabeledContent("Notes") {
-//                TextEditor(text: $jobListing.notes)
-//            }
-//        }
-//        .padding()
     }
     
     var header: some View {

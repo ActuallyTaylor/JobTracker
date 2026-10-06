@@ -67,7 +67,6 @@ struct CreateJobListingSheet: View {
                     .foregroundStyle(.red)
             }
         }
-        .padding()
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Add Listing", role: .confirm) {
@@ -86,19 +85,36 @@ struct CreateJobListingSheet: View {
                     }
                 }
                 .disabled(submitDisabled)
+                #if os(macOS)
                 .buttonStyle(.glassProminent)
+                #endif
             }
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel", role: .cancel) {
                     dismiss()
                 }
+                #if os(macOS)
                 .buttonStyle(.glass)
+                #endif
             }
         }
+        .navigationTitle("Add Application")
+        #if os(macOS)
+        .padding()
+        #endif
     }
 }
 
 #Preview {
-    CreateJobListingSheet()
-        .modelContainer(for: [JobListing.self, JobApplicationEssay.self])
+    #if os(macOS)
+    CreateJobListingSheet(jobStatus: .unapplied)
+            .modelContainer(for: [JobListing.self, JobApplicationEssay.self])
+    #else
+    // Add a navigation stack to give the view a title and toolbar
+    NavigationStack {
+        CreateJobListingSheet(jobStatus: .unapplied)
+    }
+    .modelContainer(for: [JobListing.self, JobApplicationEssay.self])
+
+    #endif
 }
