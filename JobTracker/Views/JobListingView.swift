@@ -13,6 +13,8 @@ struct JobListingView: View {
     @State var jobListing: JobListing
     @State var stringifiedURL: String = ""
     
+    @State var presentJobEditSheet: Bool = false
+
     init(jobListing: JobListing) {
         _jobListing = State(wrappedValue: jobListing)
         _stringifiedURL = State(wrappedValue: jobListing.url.absoluteString)
@@ -29,6 +31,25 @@ struct JobListingView: View {
             }
             .padding(.horizontal, 10)
         }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    presentJobEditSheet.toggle()
+                } label: {
+                    Label("Edit Listing", systemSymbol: .pencilAndListClipboard)
+                }
+            }
+        }
+        .sheet(isPresented: $presentJobEditSheet) {
+            #if os(macOS)
+            CreateJobListingSheet(existingListing: jobListing)
+            #else
+            // Add a navigation stack to give the view a title and toolbar
+            NavigationStack {
+                CreateJobListingSheet(existingListing: jobListing)
+            }
+            #endif
+        }
     }
     
     var header: some View {
@@ -36,8 +57,15 @@ struct JobListingView: View {
             VStack(alignment: .leading) {
                 Text(jobListing.name)
                     .font(.title)
-                Text(jobListing.companyName)
-                    .font(.headline)
+                HStack {
+                    Text(jobListing.companyName)
+                    Text("•")
+                    Text(jobListing.location)
+                }
+                .font(.headline)
+                if let compensation = jobListing.compensation {
+                    
+                }
             }
             
             Spacer()
@@ -68,6 +96,6 @@ struct JobListingView: View {
 }
 
 #Preview {
-    JobListingView(jobListing: JobListing(status: .applied, name: "iOS Engineer", companyName: "Taylor Lineman", url: URL(string: "https://actuallytaylor.com")!, notes: "This job is awesome and I am so excited for it.", creationDate: .now))
+    JobListingView(jobListing: JobListing(status: .applied, name: "iOS Engineer", companyName: "Taylor Lineman", url: URL(string: "https://actuallytaylor.com")!, notes: "This job is awesome and I am so excited for it.", location: "Remote", compensation: Compensation(salaryMin: 135000, salaryMax: 165000, hourlyRate: 65), creationDate: .now))
         .frame(width: 350)
 }

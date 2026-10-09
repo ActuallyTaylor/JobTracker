@@ -32,7 +32,7 @@ struct EssayListView: View {
                 Spacer()
                 
                 Button {
-                    let newEssay = JobApplicationEssay(listing: jobListing, name: "", content: "")
+                    let newEssay = JobApplicationEssay(listing: jobListing, name: "", content: "", isComplete: false)
                     modelContext.insert(newEssay)
                 } label: {
                     Image(systemSymbol: .plus)
@@ -77,7 +77,7 @@ struct EssayView: View {
 
 #Preview {
     List {
-        EssayListView(jobListing: JobListing(status: .applied, name: "iOS Engineer", companyName: "Taylor Lineman", url: URL(string: "https://actuallytaylor.com")!, notes: "This job is awesome and I am so excited for it.", creationDate: .now))
+        EssayListView(jobListing: JobListing(status: .applied, name: "iOS Engineer", companyName: "Taylor Lineman", url: URL(string: "https://actuallytaylor.com")!, notes: "This job is awesome and I am so excited for it.", location: "Remote", compensation: nil, creationDate: .now))
     }
     .modelContainer(try! ModelContainer(for: .trackerSchema, configurations: [
         ModelConfiguration(schema: .trackerSchema, isStoredInMemoryOnly: true)
@@ -85,5 +85,5 @@ struct EssayView: View {
 }
 
 #Preview {
-    EssayView(essay: JobApplicationEssay(listing: JobListing(status: .applied, name: "iOS Engineer", companyName: "Taylor Lineman", url: URL(string: "https://actuallytaylor.com")!, notes: "This job is awesome and I am so excited for it.", creationDate: .now), name: "This is a test", content: "This is some test content about why I want to work for Taylor."))
+    EssayView(essay: JobApplicationEssay(listing: JobListing(status: .applied, name: "iOS Engineer", companyName: "Taylor Lineman", url: URL(string: "https://actuallytaylor.com")!, notes: "This job is awesome and I am so excited for it.", location: "", compensation: nil, creationDate: .now), name: "This is a test", content: "This is some test content about why I want to work for Taylor.", isComplete: true))
 }

@@ -89,13 +89,6 @@ struct RootView: View {
                 let jobs = jobListings.filter({ $0.status == selectedStatus })
                 
                 JobStatusList(selectedJobs: $selectedJobs, status: selectedStatus, jobs: jobs)
-                    .toolbar {
-                        Button {
-                            presentJobCreationSheet.toggle()
-                        } label: {
-                            Label("Add Job Listing", systemSymbol: .plus)
-                        }
-                    }
             } else {
                 Text("Select a Status")
             }
@@ -106,6 +99,13 @@ struct RootView: View {
                         .id(selectedJob.id)
                 } else {
                     Text("Select a job to see details.")
+                }
+            }
+            .toolbar {
+                Button {
+                    presentJobCreationSheet.toggle()
+                } label: {
+                    Label("Add Job Listing", systemSymbol: .plus)
                 }
             }
         }
