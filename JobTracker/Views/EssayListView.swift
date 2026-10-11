@@ -25,6 +25,9 @@ struct EssayListView: View {
             ForEach(jobListing.essays) { essay in
                 EssayView(essay: essay)
             }
+            .onDelete { setToDelete in
+                jobListing.essays.remove(atOffsets: setToDelete)
+            }
         } header: {
             HStack {
                 Text("Application Essays")
@@ -49,29 +52,12 @@ struct EssayView: View {
     @State var showTrash: Bool = false
     
     var body: some View {
-        HStack {
+        VStack {
             TextField("Name", text: $essay.name)
                 .textFieldStyle(.plain)
                 .font(.headline)
-            
-            if showTrash {
-                Button(role: .destructive) {
-                    modelContext.delete(essay)
-                } label: {
-                    Image(systemSymbol: .trash)
-                }
-                .tint(.red)
-            }
+            TextField("Answer", text: $essay.content, axis: .vertical)
         }
-        .padding(.horizontal, 5)
-        .onHover { hovering in
-            withAnimation {
-                showTrash = hovering
-            }
-        }
-        TextEditor(text: $essay.content)
-        Divider()
-            .tint(.accentColor)
     }
 }
 

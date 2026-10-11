@@ -38,9 +38,7 @@ struct CreateJobListingSheet: View {
     @State var salaryMax: Int? = nil
     @State var hourlyRate: Int? = nil
     
-    var localeCurrency: String {
-        Locale.current.currency?.identifier ?? "USD"
-    }
+    let localeCurrency: String = Locale.current.currency?.identifier ?? "USD"
     
     init(jobStatus: JobStatus) {
         self._jobStatus = State(initialValue: jobStatus)
@@ -79,43 +77,55 @@ struct CreateJobListingSheet: View {
     }
     
     var body: some View {
-        ScrollView {
-            Form {
-                Section("**General Information**") {
-                    TextField("Name \(Text("*").foregroundColor(.red))", text: $jobName)
-                    TextField("Company \(Text("*").foregroundColor(.red))", text: $companyName)
-                    TextField("Application URL \(Text("*").foregroundColor(.red))", text: $stringedURL)
-                    TextField("Location \(Text("*").foregroundColor(.red))", text: $location)
-                    
-                    Picker("Status", selection: $jobStatus) {
-                        ForEach(JobStatus.allCases, id: \.description) { status in
-                            Text(status.description)
-                                .tag(status)
-                        }
+        Form {
+            Section {
+                TextField("Name", text: $jobName)
+                    .textContentType(.jobTitle)
+                TextField("Company", text: $companyName)
+                    .textContentType(.organizationName)
+                TextField("Application URL", text: $stringedURL)
+                    .textContentType(.URL)
+                TextField("Location", text: $location)
+                    .textContentType(.location)
+                
+                Picker("Status", selection: $jobStatus) {
+                    ForEach(JobStatus.allCases, id: \.description) { status in
+                        Text(status.description)
+                            .tag(status)
                     }
-                    .tint(jobStatus.color)
                 }
-                
-                Section("**Compensation**") {
-                    TextField("Salary Min", value: $salaryMin, format: .currency(code: localeCurrency))
-                    TextField("Salary Max", value: $salaryMax, format: .currency(code: localeCurrency))
-                    TextField("Hourly", value: $hourlyRate, format: .currency(code: localeCurrency))
-                }
+                .tint(jobStatus.color)
+            } header: {
+                Text("**General Information** \(Text("*").foregroundColor(.red))")
+            }
+            
+            Section("**Compensation**") {
+                TextField("Salary Min", value: $salaryMin, format: .currency(code: localeCurrency))
+                    #if !os(macOS)
+                    .keyboardType(.numbersAndPunctuation)
+                    #endif
+                TextField("Salary Max", value: $salaryMax, format: .currency(code: localeCurrency))
+                    #if !os(macOS)
+                    .keyboardType(.numbersAndPunctuation)
+                    #endif
+                TextField("Hourly", value: $hourlyRate, format: .currency(code: localeCurrency))
+                    #if !os(macOS)
+                    .keyboardType(.numbersAndPunctuation)
+                    #endif
+            }
 #if !os(macOS)
-                .keyboardType(.numberPad)
+            .keyboardType(.numberPad)
 #endif
-                
-                Section("Notes") {
-                    TextEditor(text: $jobNotes)
-                        .lineLimit(4, reservesSpace: true)
-                }
-                
-                
-                if let creationError {
-                    Text(creationError.localizedDescription)
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                }
+            
+            Section("**Extras**") {
+                TextField("Notes", text: $jobNotes, axis: .vertical)
+            }
+            
+            
+            if let creationError {
+                Text(creationError.localizedDescription)
+                    .font(.caption)
+                    .foregroundStyle(.red)
             }
         }
         .toolbar {
