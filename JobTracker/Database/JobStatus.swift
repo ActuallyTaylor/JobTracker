@@ -12,7 +12,8 @@ enum JobStatus: Int, Codable, CaseIterable, CustomStringConvertible {
     case applied
     case interviewing
     case offer
-    case passed
+    case accepted
+    case rejected
     case closed
     
     var description: String {
@@ -25,8 +26,10 @@ enum JobStatus: Int, Codable, CaseIterable, CustomStringConvertible {
             "Interviewing"
         case .offer:
             "Offer"
-        case .passed:
-            "Passed"
+        case .accepted:
+            "Accepted"
+        case .rejected:
+            "Rejected"
         case .closed:
             "Closed"
         }
@@ -42,8 +45,10 @@ enum JobStatus: Int, Codable, CaseIterable, CustomStringConvertible {
             return .purple
         case .offer:
             return .mint
-        case .passed:
+        case .accepted:
             return .green
+        case .rejected:
+            return .orange
         case .closed:
             return .red
         }
