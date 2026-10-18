@@ -14,11 +14,46 @@ struct JobStatusList: View {
     @Binding var selectedJobs: Set<JobListing>
     var status: JobStatus
     var jobs: [JobListing]
+    
+    var filteredJobs: [JobListing] {
+        if !filteredLocations.isEmpty {
+            jobs.filter({ filteredLocations.contains($0.location) })
+        } else {
+            jobs
+        }
+    }
+
+    @State var locationFilters: [String] = []
+    @State var filteredLocations: Set<String> = []
         
     var body: some View {
+        content
+            .toolbar {
+                ToolbarItem {
+                    Menu("Filters", systemImage: SFSymbol.line3HorizontalDecrease.rawValue) {
+                        
+                        Menu("Locations") {
+                            MultiPicker(selection: $filteredLocations) {
+                                ForEach(locationFilters, id: \.self) { location in
+                                    Text(location)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+            .onChange(of: jobs, initial: true) { _, newValue in
+                locationFilters = Array(Set(newValue.compactMap( {
+                    $0.location.isEmpty ? nil : $0.location
+                })))
+            }
+    }
+    
+    var content: some View {
         #if os(macOS)
         List(selection: $selectedJobs) {
-            ForEach(jobs) { job in
+            ForEach(filteredJobs) { job in
                 row(for: job)
             }
             .onDelete { indexSet in

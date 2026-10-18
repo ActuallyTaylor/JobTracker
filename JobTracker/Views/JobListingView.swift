@@ -97,10 +97,12 @@ struct JobListingView: View {
             VStack(alignment: .leading) {
                 Text(jobListing.name)
                     .font(.title)
-                HStack {
+                HStack(spacing: 5) {
                     Text(jobListing.companyName)
-                    Text("•")
-                    Text(jobListing.location)
+                    if !jobListing.location.isEmpty {
+                        Text("•")
+                        Text(jobListing.location)
+                    }
                 }
                 .font(.headline)
             }

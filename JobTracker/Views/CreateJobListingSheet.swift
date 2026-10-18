@@ -85,6 +85,9 @@ struct CreateJobListingSheet: View {
                     .textContentType(.organizationName)
                 TextField("Application URL", text: $stringedURL)
                     .textContentType(.URL)
+                    #if !os(macOS)
+                    .textInputAutocapitalization(.never)
+                    #endif
                 TextField("Location", text: $location)
                     .textContentType(.location)
                 
